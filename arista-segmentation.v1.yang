@@ -1,0 +1,294 @@
+module "arista-segmentation.v1" {
+	yang-version "1";
+	namespace "https://arista.com/fmp/segmentation.v1";
+	prefix "segmentation.v1";
+	import "ietf-inet-types" {
+		prefix "inet";
+		revision-date "2013-07-15";
+	}
+	organization "Arista Networks";
+	contact "cvp-api-dev@arista.com";
+	description "segmentation.v1 module";
+	revision "2020-04-27" {
+		description "Initial revision";
+		reference "1.0.0";
+	}
+	typedef "action" {
+		type "enumeration" {
+			enum "ACTION_UNSPECIFIED" {
+				value "0";
+				description "ACTION_UNSPECIFIED indicates that a action is unspecified.";
+			}
+			enum "ACTION_DROP" {
+				value "1";
+				description "ACTION_DROP indicates that packets should be dropped.";
+			}
+			enum "ACTION_FORWARD" {
+				value "2";
+				description "ACTION_FORWARD indicates that packets should be forwarded.";
+			}
+		}
+		description "action enumeration";
+	}
+	grouping "application-action" {
+		description "ApplicationAction is the application name - Action pairing.";
+		list "values" {
+			key "key";
+			description "";
+			leaf "key" {
+				type "string";
+				description "values key";
+			}
+			leaf "action" {
+				type "action";
+				description "values value";
+			}
+		}
+	}
+	grouping "application-list" {
+		description "ApplicationList is a container for a list of application names.";
+		leaf-list "values" {
+			type "string";
+			ordered-by "user";
+			description "";
+		}
+	}
+	grouping "ip-prefix-config" {
+		description "IPPrefixConfig is a collection of prefix mapped to a segment.";
+		uses "ip-prefix-key";
+		leaf "segment" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "ip-prefix-config-list" {
+		description "";
+		list "values" {
+			key "ip-prefix";
+			description "keyed list of IPPrefixConfig";
+			uses "ip-prefix-config";
+		}
+	}
+	grouping "segment-config" {
+		description "";
+		uses "segment-key";
+	}
+	grouping "segment-config-list" {
+		description "";
+		list "values" {
+			key "segment";
+			description "keyed list of SegmentConfig";
+			uses "segment-config";
+		}
+	}
+	grouping "segment-policy" {
+		description "";
+		uses "segment-policy-key";
+		container "counters" {
+			description "";
+			uses "segment-policy-counters";
+		}
+	}
+	grouping "segment-policy-config" {
+		description "";
+		uses "segment-policy-key";
+		leaf "policy" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "segment-policy-config-list" {
+		description "";
+		list "values" {
+			key "src-segment dst-segment";
+			description "keyed list of SegmentPolicyConfig";
+			uses "segment-policy-config";
+		}
+	}
+	grouping "segment-policy-counters" {
+		description "";
+		leaf "hits" {
+			type "uint64";
+			description "";
+		}
+		leaf "drops" {
+			type "uint64";
+			description "";
+		}
+	}
+	grouping "segment-policy-list" {
+		description "";
+		list "values" {
+			key "src-segment dst-segment";
+			description "keyed list of SegmentPolicy";
+			uses "segment-policy";
+		}
+	}
+	grouping "application-key" {
+		description "ApplicationKey is the name of the application.";
+		leaf "application" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "domain-key" {
+		description "";
+		leaf "domain" {
+			type "string";
+			description "";
+		}
+		leaf "vrf" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "ip-prefix-key" {
+		description "IPPrefixKey is a unique IP prefix.";
+		leaf "ip-prefix" {
+			type "inet:ip-prefix";
+			description "";
+		}
+	}
+	grouping "policy-key" {
+		description "PolicyKey is a unique identifier for a Policy";
+		leaf "policy" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "segment-key" {
+		description "SegmentKey is a unique key representing a Segment.";
+		leaf "segment" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "segment-policy-key" {
+		description "";
+		leaf "src-segment" {
+			type "string";
+			description "";
+		}
+		leaf "dst-segment" {
+			type "string";
+			description "";
+		}
+	}
+	grouping "application-config" {
+		description "";
+		uses "application-key";
+		leaf "src-port-start" {
+			type "inet:port-number";
+			description "";
+		}
+		leaf "src-port-end" {
+			type "inet:port-number";
+			description "";
+		}
+		leaf "dst-port-start" {
+			type "inet:port-number";
+			description "";
+		}
+		leaf "dst-port-end" {
+			type "inet:port-number";
+			description "";
+		}
+		leaf "protocol" {
+			type "uint32";
+			description "";
+		}
+	}
+	grouping "default-action-config" {
+		description "";
+		leaf "unspecified-policy-action" {
+			type "action";
+			description "unspecified_policy_action determines what action the hardware should take
+			             when it sees a packet whose destination IP is assigned to a
+			             segment, but no segment policy applies.";
+		}
+	}
+	grouping "domain" {
+		description "";
+		uses "domain-key";
+		list "segment-policy" {
+			key "src-segment dst-segment";
+			description "keyed list of SegmentPolicy";
+			uses "segment-policy";
+		}
+	}
+	grouping "domain-config" {
+		description "";
+		uses "domain-key";
+		list "ip-prefix" {
+			key "ip-prefix";
+			description "keyed list of IPPrefixConfig";
+			uses "ip-prefix-config";
+		}
+		list "segment" {
+			key "segment";
+			description "keyed list of SegmentConfig";
+			uses "segment-config";
+		}
+		list "segment-policy" {
+			key "src-segment dst-segment";
+			description "keyed list of SegmentPolicyConfig";
+			uses "segment-policy-config";
+		}
+	}
+	grouping "policy-config" {
+		description "PolicyConfig contains the actions to take for each application in the
+		             policy.";
+		uses "policy-key";
+		leaf-list "application-order" {
+			type "string";
+			ordered-by "user";
+			description "";
+		}
+		list "application-action" {
+			key "key";
+			description "";
+			leaf "key" {
+				type "string";
+				description "application-action key";
+			}
+			leaf "action" {
+				type "action";
+				description "application-action value";
+			}
+		}
+	}
+	container "segmentation" {
+		description "segmentation.v1 top-level container";
+		container "config" {
+			description "segmentation.v1 config";
+			list "application" {
+				key "application";
+				description "keyed list of ApplicationConfig";
+				uses "application-config";
+			}
+			container "default-action" {
+				description "DefaultActionConfig resource container";
+				uses "default-action-config";
+			}
+			list "domain" {
+				key "domain vrf";
+				description "keyed list of DomainConfig";
+				uses "domain-config";
+			}
+			list "policy" {
+				key "policy";
+				description "keyed list of PolicyConfig";
+				uses "policy-config";
+			}
+		}
+		container "state" {
+			config "false";
+			description "segmentation.v1 state";
+			list "domain" {
+				key "domain vrf";
+				description "keyed list of Domain";
+				uses "domain";
+			}
+		}
+	}
+}
