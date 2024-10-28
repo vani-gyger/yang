@@ -386,7 +386,7 @@ submodule "openconfig-bgp-neighbor" {
 			description "The source TCP port being used by the peer for the TCP session
 			             supporting the BGP session.  This is expected to be the same value
 			             as the configured neighbor-port if the local device initiated the
-			             connection or\u00a0a different TCP port if the peer initiated the TCP
+			             connection or a different TCP port if the peer initiated the TCP
 			             session.";
 		}
 	}
